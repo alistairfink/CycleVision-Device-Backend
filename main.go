@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/alexandrevicenzi/go-sse"
+	"github.com/alistairfink/CycleVision-Device-Backend/Controllers"
 	"github.com/alistairfink/CycleVision-Device-Backend/Utilities"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -11,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 )
 
 func main() {
@@ -51,17 +51,12 @@ func routes() (*chi.Mux, func()) {
 
 	// Controllers
 	sseController := sse.NewServer(nil)
+	signallingController := Controllers.NewSignallingController(sseController)
 
 	router.Route("/api", func(routes chi.Router) {
 		routes.Mount("/event", sseController)
+		routes.Mount("/signal", signallingController.Routes())
 	})
-
-	go func() {
-		for {
-			sseController.SendMessage("/api/event/test", sse.SimpleMessage(time.Now().Format("2006/02/01/ 15:04:05")))
-			time.Sleep(5 * time.Second)
-		}
-	}()
 
 	return router, func() {
 		sseController.Shutdown()
