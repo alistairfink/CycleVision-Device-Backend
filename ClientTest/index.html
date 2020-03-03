@@ -9,7 +9,7 @@
     <div id="messages"></div>
 
     <script type="text/javascript">
-        e1 = new EventSource('http://localhost:41691/api/event');
+        e1 = new EventSource('http://127.0.0.1:41691/api/event');
         e1.onmessage = function(event) {
             console.log(event);
             document.getElementById('messages').innerHTML += 'Message on channel-1: ' + event.data + '<br>';

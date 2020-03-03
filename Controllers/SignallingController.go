@@ -1,13 +1,12 @@
 package Controllers
 
 import (
-	"encoding/json"
 	"github.com/alexandrevicenzi/go-sse"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type Signal struct {
@@ -28,28 +27,20 @@ func NewSignallingController(sseController *sse.Server) *SignallingController {
 
 func (this *SignallingController) Routes() *chi.Mux {
 	router := chi.NewRouter()
-	router.Post("/", this.Post)
+	router.Get("/{signal}", this.Get)
 	return router
 }
 
-func (this *SignallingController) Post(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
+func (this *SignallingController) Get(w http.ResponseWriter, r *http.Request) {
+	signalUnparsed := chi.URLParam(r, "signal")
+	signal, err := strconv.ParseBool(signalUnparsed)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, "Error Processing Request", http.StatusBadRequest)
 		return
 	}
 
-	var signalModel Signal
-	err = json.Unmarshal(body, &signalModel)
-	if err != nil {
-		log.Print(err)
-		http.Error(w, "Error Processing Model", http.StatusBadRequest)
-		return
-	}
-
-	if signalModel.Signal {
+	if signal {
 		this.sseServer.SendMessage("/api/event", sse.SimpleMessage("True"))
 	} else {
 		this.sseServer.SendMessage("/api/event", sse.SimpleMessage("False"))
