@@ -55,12 +55,12 @@ func routes() (*chi.Mux, func()) {
 	signallingController := Controllers.NewSignallingController(sseController)
 	videoStreamController, close := Controllers.NewVideoStreamController(gstreamPipeline)
 	go videoStreamController.Getframes()
+	videoStreamController.Routes()
 	defer close()
 
 	router.Route("/api", func(routes chi.Router) {
 		routes.Mount("/event", sseController)
 		routes.Mount("/signal", signallingController.Routes())
-		routes.Mount("/video", videoStreamController.Routes())
 	})
 
 	return router, func() {
