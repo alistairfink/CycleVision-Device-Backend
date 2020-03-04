@@ -45,7 +45,6 @@ func routes() (*chi.Mux, func()) {
 	router.Use(
 		render.SetContentType(render.ContentTypeJSON),
 		middleware.Logger,
-		middleware.DefaultCompress,
 		middleware.RedirectSlashes,
 		middleware.Recoverer,
 		CorsMiddleware,
@@ -61,7 +60,7 @@ func routes() (*chi.Mux, func()) {
 	router.Route("/api", func(routes chi.Router) {
 		routes.Mount("/event", sseController)
 		routes.Mount("/signal", signallingController.Routes())
-		routes.Match("/video", videoStreamController.Routes())
+		routes.Mount("/video", videoStreamController.Routes())
 	})
 
 	return router, func() {
