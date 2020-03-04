@@ -60,7 +60,7 @@ func (this *VideoStreamController) Getframes() {
 		}
 		this.frameId++
 		gocv.Resize(img, &img, image.Point{}, float64(0.5), float64(0.5), 0)
-		frame, _ = gocv.IMEncode(".jpg", img)
+		this.frame, _ = gocv.IMEncode(".jpg", img)
 
 	}
 }
