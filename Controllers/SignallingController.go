@@ -9,10 +9,6 @@ import (
 	"strconv"
 )
 
-type Signal struct {
-	Signal bool
-}
-
 type SignallingController struct {
 	sseServer *sse.Server
 }

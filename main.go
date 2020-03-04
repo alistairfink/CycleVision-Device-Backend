@@ -14,6 +14,8 @@ import (
 	"strings"
 )
 
+var gstreamPipeline string = "nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=(string)NV12, framerate=21/1 ! nvvidconv flip-method=2 ! video/x-raw, width=1280, height=720, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink"
+
 func main() {
 	// Read Config
 	var config *Utilities.Config
@@ -52,10 +54,14 @@ func routes() (*chi.Mux, func()) {
 	// Controllers
 	sseController := sse.NewServer(nil)
 	signallingController := Controllers.NewSignallingController(sseController)
+	videoStreamController, close := Controllers.NewVideoStreamController(gstreamPipeline)
+	go videoStreamController.Getframes()
+	defer close()
 
 	router.Route("/api", func(routes chi.Router) {
 		routes.Mount("/event", sseController)
 		routes.Mount("/signal", signallingController.Routes())
+		routes.Match("/video", videoStreamController.Routes())
 	})
 
 	return router, func() {
