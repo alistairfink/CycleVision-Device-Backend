@@ -1,18 +1,20 @@
 package Controllers
 
 import (
+	"fmt"
 	"github.com/go-chi/chi"
-	"github.com/go-chi/render"
 	"gocv.io/x/gocv"
+	"image"
 	"net/http"
 	"sync"
 	"time"
 )
 
 type VideoStreamController struct {
-	camera *gocv.VideoCapture
-	frame  []byte
-	mutex  *sync.Mutex
+	camera  *gocv.VideoCapture
+	frame   []byte
+	mutex   *sync.Mutex
+	frameId int
 }
 
 func NewVideoStreamController(gstreamPipeline string) (*VideoStreamController, func()) {
@@ -38,7 +40,7 @@ func (this *VideoStreamController) Get(w http.ResponseWriter, r *http.Request) {
 	data := ""
 	for {
 		this.mutex.Lock()
-		data = "--frame\r\n  Content-Type: image/jpeg\r\n\r\n" + string(frame) + "\r\n\r\n"
+		data = "--frame\r\n  Content-Type: image/jpeg\r\n\r\n" + string(this.frame) + "\r\n\r\n"
 		this.mutex.Unlock()
 		time.Sleep(33 * time.Millisecond)
 		w.Write([]byte(data))
@@ -56,7 +58,7 @@ func (this *VideoStreamController) Getframes() {
 		if img.Empty() {
 			continue
 		}
-		frame_id++
+		this.frameId++
 		gocv.Resize(img, &img, image.Point{}, float64(0.5), float64(0.5), 0)
 		frame, _ = gocv.IMEncode(".jpg", img)
 
