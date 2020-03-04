@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi"
 	"gocv.io/x/gocv"
 	"image"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -18,8 +19,13 @@ type VideoStreamController struct {
 }
 
 func NewVideoStreamController(gstreamPipeline string) (*VideoStreamController, func()) {
+	cam, err := gocv.OpenVideoCapture(gstreamPipeline)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
 	controller := VideoStreamController{
-		camera: gocv.OpenVideoCapture(gstreamPipeline),
+		camera: cam,
 		frame:  []byte{},
 		mutex:  &sync.Mutex{},
 	}
