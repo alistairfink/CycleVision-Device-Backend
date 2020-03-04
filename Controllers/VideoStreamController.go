@@ -34,8 +34,10 @@ func NewVideoStreamController(gstreamPipeline string) (*VideoStreamController, f
 	}
 }
 
-func (this *VideoStreamController) Routes() {
-	http.HandleFunc("/video", this.Get)
+func (this *VideoStreamController) Routes() *chi.Mux {
+	router := chi.NewRouter()
+	router.Get("/", this.Get)
+	return router
 }
 
 func (this *VideoStreamController) Get(w http.ResponseWriter, r *http.Request) {
