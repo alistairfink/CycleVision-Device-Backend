@@ -2,6 +2,7 @@ package Controllers
 
 import (
 	"fmt"
+	"github.com/go-chi/chi"
 	"gocv.io/x/gocv"
 	"image"
 	"log"
