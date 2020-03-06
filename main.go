@@ -53,11 +53,13 @@ func routes() (*chi.Mux, func()) {
 	// Controllers
 	sseController := sse.NewServer(nil)
 	signallingController := Controllers.NewSignallingController(sseController)
+	healthCheckController := Controllers.HealthCheckController()
 	videoStreamController, videoClose := Controllers.NewVideoStreamController(gstreamPipeline)
 	go videoStreamController.Getframes()
 
 	router.Route("/api", func(routes chi.Router) {
 		routes.Mount("/event", sseController)
+		routes.Mount("/alive", healthCheckController.Routes())
 		routes.Mount("/signal", signallingController.Routes())
 		routes.Mount("/video", videoStreamController.Routes())
 	})
