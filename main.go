@@ -53,7 +53,7 @@ func routes() (*chi.Mux, func()) {
 	// Controllers
 	sseController := sse.NewServer(nil)
 	signallingController := Controllers.NewSignallingController(sseController)
-	healthCheckController := Controllers.HealthCheckController()
+	healthCheckController := Controllers.NewHealthCheckController()
 	videoStreamController, videoClose := Controllers.NewVideoStreamController(gstreamPipeline)
 	go videoStreamController.Getframes()
 
