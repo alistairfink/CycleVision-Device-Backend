@@ -18,8 +18,8 @@ type VideoStreamController struct {
 	frameId int
 }
 
-func NewVideoStreamController(gstreamPipeline string) (*VideoStreamController, func()) {
-	cam, err := gocv.OpenVideoCapture(gstreamPipeline)
+func NewVideoStreamController() (*VideoStreamController, func()) {
+	cam, err := gocv.VideoCaptureDevice(1)
 	if err != nil {
 		log.Panic(err.Error())
 	}
